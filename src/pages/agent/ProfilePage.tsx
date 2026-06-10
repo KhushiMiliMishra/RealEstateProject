@@ -1,6 +1,38 @@
+import { useEffect, useState } from "react";
 import MainLayout from "../../components/layout/MainLayout";
+import { getAgentByUserId } from "../../services/agentService";
 
 export default function ProfilePage() {
+  const [agent, setAgent] = useState<any>(null);
+
+  useEffect(() => {
+    loadProfile();
+  }, []);
+
+  const loadProfile = async () => {
+    try {
+      const user = JSON.parse(
+        localStorage.getItem("user") || "{}"
+      );
+
+      const data = await getAgentByUserId(user.id);
+
+      setAgent(data);
+    } catch (error) {
+      console.error("Failed to load profile", error);
+    }
+  };
+
+  if (!agent) {
+    return (
+      <MainLayout role="agent" title="Profile">
+        <div className="p-10 text-center">
+          Loading Profile...
+        </div>
+      </MainLayout>
+    );
+  }
+
   return (
     <MainLayout role="agent" title="Profile">
       <div className="max-w-5xl mx-auto">
@@ -11,20 +43,24 @@ export default function ProfilePage() {
           <div className="flex items-center gap-6">
 
             <div className="w-24 h-24 rounded-full bg-[#1D3557] flex items-center justify-center text-white text-3xl font-bold">
-              AR
+              {agent.fullName
+                ?.split(" ")
+                .map((word: string) => word[0])
+                .join("")
+                .substring(0, 2)}
             </div>
 
             <div>
               <h2 className="text-3xl font-bold">
-                Alex Realty
+                {agent.fullName}
               </h2>
 
               <p className="text-gray-500">
-                Premium Real Estate Agent
+                Real Estate Agent
               </p>
 
               <div className="mt-3 inline-flex px-3 py-1 rounded-full bg-green-100 text-green-700 text-sm">
-                Verified Agent
+                {agent.status}
               </div>
             </div>
 
@@ -41,6 +77,7 @@ export default function ProfilePage() {
             </h3>
 
             <div className="space-y-4">
+
               <div>
                 <label className="text-sm text-gray-500">
                   Full Name
@@ -48,7 +85,8 @@ export default function ProfilePage() {
 
                 <input
                   className="w-full border rounded-xl px-4 py-3 mt-1"
-                  defaultValue="Alex Realty"
+                  value={agent.fullName || ""}
+                  readOnly
                 />
               </div>
 
@@ -59,7 +97,8 @@ export default function ProfilePage() {
 
                 <input
                   className="w-full border rounded-xl px-4 py-3 mt-1"
-                  defaultValue="alex@realty.com"
+                  value={agent.email || ""}
+                  readOnly
                 />
               </div>
 
@@ -70,11 +109,15 @@ export default function ProfilePage() {
 
                 <input
                   className="w-full border rounded-xl px-4 py-3 mt-1"
-                  defaultValue="+91 9876543210"
+                  value={agent.phone || ""}
+                  readOnly
                 />
               </div>
+
             </div>
           </div>
+
+          {/* Business Information */}
 
           <div className="bg-white rounded-2xl p-6 border border-gray-100">
             <h3 className="font-semibold text-lg mb-5">
@@ -82,6 +125,7 @@ export default function ProfilePage() {
             </h3>
 
             <div className="space-y-4">
+
               <div>
                 <label className="text-sm text-gray-500">
                   Company
@@ -89,7 +133,8 @@ export default function ProfilePage() {
 
                 <input
                   className="w-full border rounded-xl px-4 py-3 mt-1"
-                  defaultValue="Prime Estates"
+                  value={agent.companyName || ""}
+                  readOnly
                 />
               </div>
 
@@ -100,7 +145,8 @@ export default function ProfilePage() {
 
                 <input
                   className="w-full border rounded-xl px-4 py-3 mt-1"
-                  defaultValue="REA-2026-4587"
+                  value="REA-2026-4587"
+                  readOnly
                 />
               </div>
 
@@ -111,9 +157,11 @@ export default function ProfilePage() {
 
                 <input
                   className="w-full border rounded-xl px-4 py-3 mt-1"
-                  defaultValue="Chennai, Bangalore"
+                  value="Chennai, Bangalore"
+                  readOnly
                 />
               </div>
+
             </div>
           </div>
 
@@ -167,12 +215,13 @@ export default function ProfilePage() {
 
         {/* Subscription */}
 
-        <div className="bg-white rounded-2xl p-6 border border-gray-100 mb-6">
+        <div className="bg-white rounded-2xl p-6 border border-gray-100">
           <h3 className="font-semibold text-lg mb-5">
             Subscription Plan
           </h3>
 
           <div className="flex justify-between items-center">
+
             <div>
               <h4 className="font-semibold">
                 Professional Plan
@@ -186,19 +235,8 @@ export default function ProfilePage() {
             <button className="bg-[#1D3557] text-white px-5 py-3 rounded-xl">
               Upgrade Plan
             </button>
+
           </div>
-        </div>
-
-        {/* Actions */}
-
-        <div className="flex justify-end gap-4">
-          <button className="border px-6 py-3 rounded-xl">
-            Cancel
-          </button>
-
-          <button className="bg-[#1D3557] text-white px-6 py-3 rounded-xl">
-            Save Changes
-          </button>
         </div>
 
       </div>

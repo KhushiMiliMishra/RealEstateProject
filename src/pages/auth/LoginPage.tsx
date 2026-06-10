@@ -8,21 +8,35 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleLogin = async () => {
-    try {
-      const result = await loginUser(email, password);
+const handleLogin = async () => {
+  try {
+    const user = await loginUser(
+      email,
+      password
+    );
 
-      if (result === "Login Success") {
-        
-        navigate("/dashboard");
-      } else {
-        alert(result);
-      }
-    } catch (error) {
-      console.error(error);
-      alert("Backend not reachable");
+    if (user) {
+
+      localStorage.setItem(
+        "user",
+        JSON.stringify(user)
+      );
+
+      navigate("/dashboard");
+
+    } else {
+
+      alert("Invalid Credentials");
+
     }
-  };
+
+  } catch (error) {
+
+    console.error(error);
+    alert("Backend not reachable");
+
+  }
+};
 
   return (
     <div className="min-h-screen bg-[#F7F9FC] flex">
